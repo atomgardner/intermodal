@@ -56,6 +56,12 @@ impl Infohash {
   }
 }
 
+impl Into<[u8; 20]> for Infohash {
+    fn into(self) -> [u8; 20] {
+        self.inner.bytes()
+    }
+}
+
 impl Into<Sha1Digest> for Infohash {
   fn into(self) -> Sha1Digest {
     self.inner

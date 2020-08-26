@@ -30,6 +30,12 @@ pub(crate) enum Error {
   FileSearch { source: ignore::Error },
   #[snafu(display("Invalid glob: {}", source))]
   GlobParse { source: globset::Error },
+  #[snafu(display("Failed to parse host port"))]
+  HostPort {
+    source: HostPortParseError,
+  },
+  #[snafu(display("io error {}", source))]
+  Io { source: io::Error },
   #[snafu(display("Failed to serialize torrent info dictionary: {}", source))]
   InfoSerialize { source: bendy::serde::Error },
   #[snafu(display("Input target empty"))]
@@ -129,6 +135,12 @@ pub(crate) enum Error {
   SymlinkRoot { root: PathBuf },
   #[snafu(display("Failed to retrieve system time: {}", source))]
   SystemTime { source: SystemTimeError },
+  #[snafu(display("The UDP tracker connection id has expired."))]
+  UdpConnectionIdExpired,
+  #[snafu(display("UDP tracker has failed to respond 9 times."))]
+  UdpConnectionExhaustedRetries,
+  #[snafu(display("UDP tracker response differed from expectations"))]
+  UdpTrackerBadResponse,
   #[snafu(display(
     "Feature `{}` cannot be used without passing the `--unstable` flag",
     feature
@@ -169,10 +181,22 @@ impl From<globset::Error> for Error {
   }
 }
 
+impl From<host_port_parse_error::HostPortParseError> for Error {
+  fn from(source: host_port_parse_error::HostPortParseError) -> Self {
+    Self::HostPort { source }
+  }
+}
+
 impl From<SystemTimeError> for Error {
   fn from(source: SystemTimeError) -> Self {
     Self::SystemTime { source }
   }
+}
+
+impl From<std::io::Error> for Error {
+    fn from(source: std::io::Error) -> Self {
+        Self::Io { source }
+    }
 }
 
 impl From<ignore::Error> for Error {
