@@ -65,6 +65,8 @@ pub(crate) enum Error {
     input: InputTarget,
     source: MetainfoError,
   },
+  #[snafu(display("A peer source is required"))]
+  NoPeerSource,
   #[snafu(display("Failed to invoke opener: {}", source))]
   OpenerInvoke { source: io::Error },
   #[snafu(display("Opener failed: {}", exit_status))]

@@ -78,7 +78,8 @@ pub(crate) use crate::{
   piece_length_picker::PieceLengthPicker, piece_list::PieceList, platform::Platform,
   sha1_digest::Sha1Digest, shell::Shell, sort_key::SortKey, sort_order::SortOrder,
   sort_spec::SortSpec, status::Status, style::Style, subcommand::Subcommand, table::Table,
-  torrent_summary::TorrentSummary, use_color::UseColor, verifier::Verifier, walker::Walker,
+  torrent_summary::TorrentSummary, use_color::UseColor, udp_tracker::UdpTrackerConn,
+  verifier::Verifier, walker::Walker,
 };
 
 // type aliases
