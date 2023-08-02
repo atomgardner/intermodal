@@ -1,6 +1,6 @@
 use crate::common::*;
 
-pub mod extended;
+pub(crate) mod extended;
 pub mod flavour;
 
 pub(crate) use flavour::Flavour;
@@ -23,6 +23,13 @@ impl Message {
     let mut payload = vec![id];
     payload.extend_from_slice(&Self::bencode(p)?);
     Ok(Self::new(Flavour::Extended, Some(payload)))
+  }
+
+  pub(crate) fn new_extended_handshake() -> Result<Self> {
+    Self::new_extended(
+      extended::Id::Handshake.into(),
+      extended::Handshake::default(),
+    )
   }
 
   #[cfg(test)]

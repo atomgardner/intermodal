@@ -79,9 +79,9 @@ impl FromLink {
     }
 
     let info = peers.par_iter().find_map_any(|addr| {
-      peer::Client::connect(addr, infohash)
+      peer::InfoFetcher::new(addr, infohash)
         .ok()
-        .and_then(|c| c.fetch_info_dict().ok())
+        .and_then(|c| c.run().ok())
     });
 
     let metainfo = match info {

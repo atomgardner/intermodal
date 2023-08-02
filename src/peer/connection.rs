@@ -1,5 +1,6 @@
 use crate::common::*;
 
+use message::extended;
 use message::Message;
 use peer::handshake::Handshake;
 use peer::message;
@@ -17,10 +18,8 @@ impl Connection {
     stream
       .set_read_timeout(Some(Duration::new(3, 0)))
       .context(error::Network)?;
-
     Self::send_handshake(&mut stream, infohash)?;
     let handshake = Self::recv_handshake(&mut stream, infohash)?;
-
     Ok(Self { stream, handshake })
   }
 
@@ -40,6 +39,11 @@ impl Connection {
       .write_all(&handshake.serialize()[..])
       .context(error::Network)?;
     Ok(handshake)
+  }
+
+  pub(crate) fn send_extension_handshake(&mut self, handshake: extended::Handshake) -> Result<()> {
+    let msg = Message::new_extended(message::extended::Id::Handshake.into(), handshake)?;
+    self.send(&msg)
   }
 
   pub(crate) fn recv(&mut self) -> Result<Message> {
@@ -71,6 +75,18 @@ impl Connection {
       flavour: message::Flavour::from(header[4]),
       payload,
     })
+  }
+
+  pub(crate) fn expect_extended_handshake(&mut self) -> Result<message::extended::Handshake> {
+    loop {
+      let m = self.recv()?;
+      if m.flavour == message::Flavour::Extended {
+        let (id, payload) = m.parse_extended_payload()?;
+        if id == message::extended::Id::Handshake {
+          return Message::from_bencode(payload);
+        }
+      }
+    }
   }
 
   pub(crate) fn send(&mut self, msg: &message::Message) -> Result<()> {

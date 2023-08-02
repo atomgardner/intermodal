@@ -118,6 +118,8 @@ pub(crate) enum Error {
     bytes: Bytes,
     source: TryFromIntError,
   },
+  #[snafu(display("Peer took too long to send extended handshake"))]
+  PeerExtendedHandshakeTimeout { source: io::Error },
   #[snafu(display("Received peer handshake with the wrong infohash"))]
   PeerHandshakeInfohash,
   #[snafu(display("Received peer handshake with the wrong protocol header"))]
